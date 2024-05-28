@@ -1,7 +1,9 @@
 from abc import ABCMeta, abstractmethod
-from typing import Callable, Generic, TypeVar, Optional
+from typing import Callable, Generic, TypeVar
 
 from gymnasium.spaces import Space
+
+from domain import UniversalDomain
 
 
 DomainVT = TypeVar("DomainVT", covariant = True)
@@ -12,15 +14,16 @@ class Function(Generic[DomainVT, CodomainVT]):
     
     def __init__(self,
             func: Callable[[DomainVT], CodomainVT],
-            domain: Space[DomainVT]):
+            domain: Space[DomainVT] = UniversalDomain()):
         self._domain = domain
         self._func = func
 
-    @property
     def support(self) -> Space[DomainVT]:
         return self._domain
 
     def __call__(self, x: DomainVT) -> CodomainVT:
+        if not self._domain.contains(x):
+            raise ValueError(f"Value {x} not in domain {self._domain}.")
         return self._func(x)
 
 
@@ -28,12 +31,11 @@ class ConstantFunction(Function[DomainVT, CodomainVT]):
     
     def __init__(self,
             value: CodomainVT,
-            domain: Optional[Space[DomainVT]] = None):
-        self._domain = domain
-        self._value = value
-        
-    def __call__(self, _: DomainVT) -> CodomainVT:
-        return self._value
+            domain: Space[DomainVT] = UniversalDomain()):
+        super().__init__(
+            lambda _: value,
+            domain
+        )
 
 
 class DiracDeltaFunction(Function[DomainVT, CodomainVT]):
@@ -42,21 +44,25 @@ class DiracDeltaFunction(Function[DomainVT, CodomainVT]):
             x: DomainVT,
             value: CodomainVT,
             default_value: CodomainVT,
-            domain: Optional[Space[DomainVT]] = None):
-        self._domain = domain
-        self._x = x
-        self._value = value 
-        self._default_value = default_value
-        
-    def __call__(self, x: DomainVT) -> CodomainVT:
-        return self._value if self._x == x else self._default_value
+            domain: Space[DomainVT] = UniversalDomain()):
+        super().__init__(
+            lambda _x: value if _x == x else default_value,
+            domain
+        )
+
+
+class IdentityFunction(Function[DomainVT, DomainVT]):
+    
+    def __init__(self,
+            domain: Space[DomainVT] = UniversalDomain()):
+        super().__init__(
+            lambda x: x,
+            domain
+        )
 
 
 class Distribution(Function[DomainVT, float], metaclass = ABCMeta):
 
-    def prob(self, x: DomainVT) -> float:
-        return self(x)
-    
     @abstractmethod
     def sample(self) -> DomainVT:
         raise NotImplementedError
