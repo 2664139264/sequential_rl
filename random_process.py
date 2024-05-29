@@ -1,43 +1,42 @@
-from typing import TypeVar, Optional, Iterable, Generic
+from typing import TypeVar, Iterable, Generic
+from abc import abstractmethod
 
 from function import Distribution
+from utils import TimeSeriesMeta
+
 
 StateT = TypeVar("StateT")
 
 
-# TODO: 时间记录功能可以与类实现解耦
-class RandomProcess(Generic[StateT]):
+class RandomProcess(Generic[StateT], metaclass = TimeSeriesMeta):
 
-    def __init__(self, distribution: Distribution[StateT]):
-        self._time = 0
-        self._init_distribution = distribution
-        self._state = distribution.sample()
+    @abstractmethod
+    def reset(self) -> None:
+        raise NotImplementedError
 
-    def reset(self, distribution: Optional[Distribution[StateT]] = None) -> None:
-        self._time = 0
-        self._state = (self._init_distribution if distribution is None else distribution).sample()
+    @abstractmethod
+    def state(self) -> StateT:
+        raise NotImplementedError
+
+    @abstractmethod
+    def step(self) -> None:
+        raise NotImplementedError
+
+
+class IndependentProcess(RandomProcess[StateT]):
+    
+    def __init__(self, distributions: Iterable[Distribution[StateT]]):
+        super().__init__()
+        self._distributions = tuple(distributions)
+        self._iter = iter(self._distributions)
+        self._state = None
+
+    def reset(self) -> None:
+        self._iter = iter(self._distributions)
+        self._state = None
 
     def state(self) -> StateT:
         return self._state
 
     def step(self) -> None:
-        self._time += 1
-        
-    def time(self) -> int:
-        return self._time
-        
-
-class IndependentProcess(RandomProcess[StateT]):
-    
-    def __init__(self, distributions: Iterable[Distribution[StateT]]):
-        self._distributions = distributions
-        self._distribution_iter = iter(self._distributions)
-        super().__init__(next(self._distribution_iter))
-        
-    def reset(self) -> None:
-        self._distribution_iter = iter(self._distributions)
-        super().reset(self._init_distribution)
-        
-    def step(self) -> None:
-        super().step()
-        self._state = next(self._distribution_iter).sample()
+        self._state = next(self._iter).sample()
