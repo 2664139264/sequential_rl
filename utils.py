@@ -1,5 +1,7 @@
 from abc import ABCMeta
 
+from typing import List, Type
+
 
 class SingletonMeta(type, metaclass = ABCMeta):
 
@@ -18,7 +20,7 @@ class TimeSeriesMeta(type, metaclass = ABCMeta):
 
     def __new__(cls, name, bases, dct):
 
-        def time(self):
+        def time(self) -> int:
             return self._time
 
         def reset_wrapper(reset):
@@ -44,3 +46,41 @@ class TimeSeriesMeta(type, metaclass = ABCMeta):
         dct["time"] = time
 
         return super().__new__(cls, name, bases, dct)
+
+
+# 先执行，再修改历史
+class WithHistoryMeta(type, metaclass = ABCMeta):
+    
+    def __new__(cls, name, bases, dct):
+        
+        def history(self) -> List:
+            return self._history
+        
+        def step_wrapper(step):
+            def record_history_step(self, *args, **kwargs):
+                result = step(self, *args, **kwargs)
+                self._history.append(self.state())
+                return result
+            return record_history_step
+
+        def reset_wrapper(reset):
+            def record_history_reset(self, *args, **kwargs):
+                result = reset(self, *args, **kwargs)
+                self._history = list()
+                return result
+            return record_history_reset
+
+        for method_name, method in dct.items():
+            if method_name in {"__init__", "reset"}:
+                dct[method_name] = reset_wrapper(method)
+            elif method_name == "step":
+                dct[method_name] = step_wrapper(method)
+        
+        dct["history"] = history
+        
+        return super().__new__(cls, name, bases, dct)
+
+
+def merge_meta(*meta_cls: Type) -> Type:
+    merged_name = "".join(cls.__name__.removesuffix("Meta") for cls in meta_cls) + "Meta"
+    return type(merged_name, meta_cls, {})

@@ -11,17 +11,26 @@ from random_process import *
 
 if __name__ == "__main__":
     
-    rp = IndependentProcess((gym.spaces.Box(i,i) for i in range(1, 10)))
+    # rp = IndependentProcess((gym.spaces.Box(i,i) for i in range(1, 11)))
     
+    rp = FiniteStateMarkovProcess()
     
-    for _ in range(100):
+    for _ in range(1, 11):
+        rp.step()
         print(rp.time())
         print(rp.state())
-        
-        rp.step()
-        
+        print(rp.history())
     
-    x = sp.Dict({"d":gym.spaces.Box(3,4,shape=(3,))})
+    rp.reset()
+
+    for _ in range(1, 11):
+        rp.step()
+        print(rp.time())
+        print(rp.state())
+        print(rp.history())
+
+
+    x = sp.Dict({"d": gym.spaces.Box(3, 4, shape=(3,))})
     y = sp.Tuple((x, x, gym.spaces.Discrete(2)))
     
     print(x.sample(), y.sample())
@@ -29,7 +38,7 @@ if __name__ == "__main__":
     
     # print(dir(x), dir(y), sep="\n")
     
-    
+    exit()
 
     
     f = Function(lambda x: x, sp.Dict({"f": sp.Box(0,1)}))

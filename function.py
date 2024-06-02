@@ -1,5 +1,7 @@
 from abc import ABCMeta, abstractmethod
-from typing import Callable, Generic, TypeVar
+from typing import Callable, Generic, TypeVar, Iterable
+
+import numpy as np
 
 from gymnasium.spaces import Space
 
@@ -66,3 +68,19 @@ class Distribution(Function[DomainVT, float], metaclass = ABCMeta):
     @abstractmethod
     def sample(self) -> DomainVT:
         raise NotImplementedError
+
+
+class DiscreteDistribution(Distribution[DomainVT]):
+    
+    def __init__(self, elements: Iterable[DomainVT], p: Iterable[float]):
+        self._elements = tuple(elements)
+        self._p = tuple(p)
+        
+    def sample(self) -> DomainVT:
+        return np.random.choice(self._elements, p = self._p)
+    
+    
+class DiscreteIntegerDistribution(DiscreteDistribution[int]):
+    
+    def __init__(self, n, p: Iterable[float]):
+        super(range(n), p)
