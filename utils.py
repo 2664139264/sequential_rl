@@ -50,7 +50,9 @@ class TimeSeriesMeta(type, metaclass = ABCMeta):
 
 # 先执行，再修改历史
 class WithHistoryMeta(type, metaclass = ABCMeta):
-    
+
+    history_keys = ("state", "action", "reward", "info")
+
     def __new__(cls, name, bases, dct):
         
         def history(self) -> List:
@@ -59,7 +61,13 @@ class WithHistoryMeta(type, metaclass = ABCMeta):
         def step_wrapper(step):
             def record_history_step(self, *args, **kwargs):
                 result = step(self, *args, **kwargs)
-                self._history.append(self.state())
+                
+                step_info = dict()
+                for key in WithHistoryMeta.history_keys:
+                    if hasattr(self, key):
+                        step_info[key] = getattr(self, key)()
+
+                self._history.append(step_info)
                 return result
             return record_history_step
 

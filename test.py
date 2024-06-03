@@ -4,31 +4,46 @@ import gymnasium as gym
 
 import gymnasium.spaces as sp
 
-from function import Function
+from function import *
 from domain import *
 
 from random_process import *
 
 if __name__ == "__main__":
     
-    # rp = IndependentProcess((gym.spaces.Box(i,i) for i in range(1, 11)))
+    rp = IndependentProcess((gym.spaces.Box(i,i) for i in range(10)))
     
-    rp = FiniteStateMarkovProcess()
+    rp = FiniteStateMarkovProcess(np.array([0.5, 0.5]), np.array([[0.2, 0.8], [0.1, 0.9]]))
     
-    for _ in range(1, 11):
-        rp.step()
-        print(rp.time())
-        print(rp.state())
-        print(rp.history())
+    rp = MarkovRewardProcess(
+        DiscreteIntegerDistribution(np.array([0.3, 0.7])),
+        lambda x: [DiscreteIntegerDistribution(np.array([0.3, 0.7])), DiscreteIntegerDistribution(np.array([0.6, 0.4]))][x],
+        lambda *x, **y: DiracDeltaDistribution(1)
+    )
     
+    rp = MarkovDecisionProcess(
+        DiscreteIntegerDistribution(np.array([0.3, 0.7])),
+        lambda x, a: ([[DiscreteIntegerDistribution(np.array([0.3, 0.7])), DiscreteIntegerDistribution(np.array([0.6, 0.4]))]]*2)[x][a],
+        lambda *x, **y: DiracDeltaDistribution(1)
+    )
+    rp = GymEnvToMarkovDecisionProcessAdapter(gym.make("CartPole-v1"))
+    rp = MarkovDecisionProcessWithPolicy(rp, lambda x: DiracDeltaDistribution(0))
     rp.reset()
-
     for _ in range(1, 11):
+        # rp.step(_ % 2)
         rp.step()
-        print(rp.time())
-        print(rp.state())
-        print(rp.history())
+        print("time ", rp.time())
+        print("obs ", rp.observation())
+        print("his ", rp.history())
 
+    rp.reset()
+    for _ in range(1, 11):
+        # rp.step(_ % 2)
+        rp.step()
+        print("time ", rp.time())
+        print("obs ", rp.observation())
+        print("his ", rp.history())
+    
 
     x = sp.Dict({"d": gym.spaces.Box(3, 4, shape=(3,))})
     y = sp.Tuple((x, x, gym.spaces.Discrete(2)))

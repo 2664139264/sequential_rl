@@ -13,7 +13,7 @@ CodomainVT = TypeVar("CodomainVT", covariant = True)
 
 
 class Function(Generic[DomainVT, CodomainVT]):
-    
+
     def __init__(self,
             func: Callable[[DomainVT], CodomainVT],
             domain: Space[DomainVT] = UniversalDomain()):
@@ -30,7 +30,7 @@ class Function(Generic[DomainVT, CodomainVT]):
 
 
 class ConstantFunction(Function[DomainVT, CodomainVT]):
-    
+
     def __init__(self,
             value: CodomainVT,
             domain: Space[DomainVT] = UniversalDomain()):
@@ -41,7 +41,7 @@ class ConstantFunction(Function[DomainVT, CodomainVT]):
 
 
 class DiracDeltaFunction(Function[DomainVT, CodomainVT]):
-    
+
     def __init__(self,
             x: DomainVT,
             value: CodomainVT,
@@ -54,7 +54,7 @@ class DiracDeltaFunction(Function[DomainVT, CodomainVT]):
 
 
 class IdentityFunction(Function[DomainVT, DomainVT]):
-    
+
     def __init__(self,
             domain: Space[DomainVT] = UniversalDomain()):
         super().__init__(
@@ -70,17 +70,35 @@ class Distribution(Function[DomainVT, float], metaclass = ABCMeta):
         raise NotImplementedError
 
 
+class DiracDeltaDistribution(DiracDeltaFunction[DomainVT, float], Distribution[DomainVT]):
+
+    def __init__(self, x: DomainVT):
+        super().__init__(x, 1, 0)
+        self._x = x
+  
+    def sample(self) -> DomainVT:
+        return self._x
+
+
 class DiscreteDistribution(Distribution[DomainVT]):
-    
+
     def __init__(self, elements: Iterable[DomainVT], p: Iterable[float]):
         self._elements = tuple(elements)
         self._p = tuple(p)
         
     def sample(self) -> DomainVT:
         return np.random.choice(self._elements, p = self._p)
-    
-    
+
+
 class DiscreteIntegerDistribution(DiscreteDistribution[int]):
-    
-    def __init__(self, n, p: Iterable[float]):
-        super(range(n), p)
+
+    def __init__(self, p: Iterable[float]):
+        super().__init__(range(len(p)), p)
+
+
+def expectation(distribution: Distribution[float], sample_num = 1) -> float:
+    return (
+        distribution.expectation() if hasattr(distribution, expectation.__name__)
+        else np.average(distribution.sample() for _ in range(sample_num))
+    )
+
