@@ -1,4 +1,4 @@
-from typing import TypeVar, Iterable, Generic, Optional, Callable
+from typing import TypeVar, Iterable, Generic, Optional, Callable, Dict, Any
 from abc import abstractmethod
 
 import numpy as np
@@ -9,18 +9,17 @@ from function import Distribution, DiscreteIntegerDistribution
 from utils import TimeSeriesMeta, WithHistoryMeta, merge_meta
 
 
-StateT = TypeVar("StateT", covariant=True)
+StateT = TypeVar("StateT", covariant = True)
 
 
-class RandomProcess(Generic[StateT], metaclass = merge_meta(TimeSeriesMeta, WithHistoryMeta)):
+class RandomProcessStem(Generic[StateT]):
 
     @abstractmethod
     def reset(self) -> None:
         raise NotImplementedError
 
-    @abstractmethod
     def state(self) -> Optional[StateT]:
-        raise NotImplementedError
+        return self._state
 
     def observation(self) -> Optional[StateT]:
         return self.state()
@@ -28,6 +27,10 @@ class RandomProcess(Generic[StateT], metaclass = merge_meta(TimeSeriesMeta, With
     @abstractmethod
     def step(self) -> None:
         raise NotImplementedError
+
+
+class RandomProcess(RandomProcessStem[StateT], metaclass = merge_meta(TimeSeriesMeta, WithHistoryMeta)):
+    pass
 
 
 class IndependentProcess(RandomProcess[StateT]):
@@ -42,11 +45,27 @@ class IndependentProcess(RandomProcess[StateT]):
         self._iter = iter(self._distributions)
         self._state = next(self._iter)
 
-    def state(self) -> Optional[StateT]:
-        return self._state
-
     def step(self) -> None:
         self._state = next(self._iter).sample()
+
+
+ActionT = TypeVar("ActionT", covariant = True)
+
+
+class RewardProcess(RandomProcess[StateT]):
+
+    def reward(self) -> float:
+        return self._reward
+
+
+class DecisionProcess(RewardProcess[StateT], Generic[StateT, ActionT]):
+    
+    @abstractmethod
+    def step(self, action: ActionT):
+        raise NotImplementedError
+
+    def action(self) -> ActionT:
+        return self._action
 
 
 class MarkovProcess(RandomProcess[StateT]):
@@ -62,10 +81,7 @@ class MarkovProcess(RandomProcess[StateT]):
 
     def reset(self) -> None:
         self._state = self._init_distribution.sample()
-        
-    def state(self) -> Optional[StateT]:
-        return self._state
-    
+
     def step(self) -> None:
         self._state = self._transition_distribution(self._state).sample()
 
@@ -87,8 +103,8 @@ class FiniteStateMarkovProcess(MarkovProcess[int]):
         )
 
 
-class MarkovRewardProcess(MarkovProcess[StateT]):
-    
+class MarkovRewardProcess(MarkovProcess[StateT], RewardProcess[StateT]):
+
     def __init__(self,
             init_distribution: Distribution[StateT],
             transition_distribution: Callable[[StateT], Distribution[StateT]],
@@ -101,20 +117,11 @@ class MarkovRewardProcess(MarkovProcess[StateT]):
         super().reset()
         self._reward = None
 
-    def reward(self) -> Optional[float]:
-        return self._reward
-    
     def step(self) -> None:
         prev_state = self._state
         self._state = self._transition_distribution(prev_state).sample()
         self._reward = self._reward_distribution(prev_state, self._state).sample()
 
-
-ActionT = TypeVar("ActionT", covariant = True)
-
-
-class DecisionProcess(RandomProcess[StateT], Generic[StateT, ActionT]):
-    pass
 
 class MarkovDecisionProcess(MarkovRewardProcess[StateT], DecisionProcess[StateT, ActionT]):
     
@@ -125,13 +132,6 @@ class MarkovDecisionProcess(MarkovRewardProcess[StateT], DecisionProcess[StateT,
         super().__init__(init_distribution, transition_distribution, reward_distribution)
         self._action = None
 
-    def reset(self) -> None:
-        super().reset()
-        self._action = None
-        
-    def action(self) -> ActionT:
-        return self._action
-    
     def step(self, action: ActionT) -> None:
         prev_state = self._state
         self._state = self._transition_distribution(prev_state, action).sample()
@@ -139,10 +139,7 @@ class MarkovDecisionProcess(MarkovRewardProcess[StateT], DecisionProcess[StateT,
         self._action = action
 
 
-# This should be Gym env to decision process adapter
-class GymEnvToMarkovDecisionProcessAdapter(MarkovDecisionProcess[StateT, ActionT]):
-
-    info_keys = ("terminated", "truncated", "info")
+class GymEnvToDecisionProcessAdapter(DecisionProcess[StateT, ActionT]):
 
     def __init__(self, gym_env: gym.Env):
         self.env = gym_env
@@ -157,23 +154,26 @@ class GymEnvToMarkovDecisionProcessAdapter(MarkovDecisionProcess[StateT, ActionT
         self._state, self._reward, terminated, truncated, info = self.env.step(action)
         self._info = {"terminated": terminated, "truncated": truncated, "info": info}
 
+    # def info(self) -> Dict[str, Any]:
+    #     return self._info
+
 
 # this should be decision process with policy
-class MarkovDecisionProcessWithPolicy(MarkovRewardProcess[StateT]):
-    def __init__(self, markov_decision_process: MarkovDecisionProcess[StateT, ActionT], policy: Callable[[StateT], Distribution[ActionT]]):
-        self.mdp = markov_decision_process
+class DecisionProcessWithPolicy(RewardProcess[StateT]):
+    def __init__(self,
+            decision_process: DecisionProcess[StateT, ActionT],
+            policy: Callable[[StateT], Distribution[ActionT]]):
+        self.decision_process = decision_process
         self.policy = policy
         self._state, self._reward = None, None
         
     def reset(self) -> None:
-        self.mdp.reset()
-        self._state, self._reward = self.mdp.state(), self.mdp.reward()
+        self.decision_process.reset()
+        self._state, self._reward = self.decision_process.state(), self.decision_process.reward()
         
     def step(self) -> None:
-        self.mdp.step(self.policy(self._state).sample())
-        self._state, self._reward = self.mdp.state(), self.mdp.reward()
+        self.decision_process.step(self.policy(self._state).sample())
+        self._state, self._reward = self.decision_process.state(), self.decision_process.reward()
 
 
 # MarkovRewardProcess should have base reward process
-class DecisionProcessWithAggregator:
-    pass

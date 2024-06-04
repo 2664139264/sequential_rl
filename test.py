@@ -26,20 +26,20 @@ if __name__ == "__main__":
         lambda x, a: ([[DiscreteIntegerDistribution(np.array([0.3, 0.7])), DiscreteIntegerDistribution(np.array([0.6, 0.4]))]]*2)[x][a],
         lambda *x, **y: DiracDeltaDistribution(1)
     )
-    rp = GymEnvToMarkovDecisionProcessAdapter(gym.make("CartPole-v1"))
-    rp = MarkovDecisionProcessWithPolicy(rp, lambda x: DiracDeltaDistribution(0))
+    rp = GymEnvToDecisionProcessAdapter(gym.make("CartPole-v1"))
+    #rp = DecisionProcessWithPolicy(rp, lambda x: DiracDeltaDistribution(0))
     rp.reset()
     for _ in range(1, 11):
-        # rp.step(_ % 2)
-        rp.step()
+        rp.step(_ % 2)
+        #rp.step()
         print("time ", rp.time())
         print("obs ", rp.observation())
         print("his ", rp.history())
 
     rp.reset()
     for _ in range(1, 11):
-        # rp.step(_ % 2)
-        rp.step()
+        rp.step(_ % 2)
+        #rp.step()
         print("time ", rp.time())
         print("obs ", rp.observation())
         print("his ", rp.history())
