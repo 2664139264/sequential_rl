@@ -5,7 +5,7 @@ import numpy as np
 
 from gymnasium.spaces import Space
 
-from domain import UniversalDomain
+from sequential_rl.envs.domain import UniversalDomain
 
 
 DomainVT = TypeVar("DomainVT", covariant = True)

@@ -1,10 +1,8 @@
 from typing import Iterable, Callable, TypeVar
 
-import numpy as np
-
-from function import universal_identity_function as identity
-from random_process import StateT, ActionT
-from utils import HistoryT
+from sequential_rl.envs.function import universal_identity_function as identity
+from sequential_rl.envs.random_process import StateT, ActionT
+from sequential_rl.envs.utils import HistoryT
 
 
 def state_extractor(history: HistoryT) -> Iterable[StateT]:

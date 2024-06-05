@@ -5,8 +5,8 @@ import numpy as np
 
 import gymnasium as gym
 
-from function import Distribution, DiscreteIntegerDistribution
-from utils import TimeSeriesMeta, WithHistoryMeta, HistoryT, merge_meta
+from sequential_rl.envs.function import Distribution, DiscreteIntegerDistribution
+from sequential_rl.envs.utils import TimeSeriesMeta, WithHistoryMeta, HistoryT, merge_meta
 
 
 StateT = TypeVar("StateT", covariant = True)

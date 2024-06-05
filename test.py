@@ -4,11 +4,11 @@ import gymnasium as gym
 
 import gymnasium.spaces as sp
 
-from function import *
-from domain import *
+from envs.function import *
+from envs.domain import *
 
-from random_process import *
-from aggregators import *
+from envs.random_process import *
+from envs.aggregators import *
 
 
 if __name__ == "__main__":

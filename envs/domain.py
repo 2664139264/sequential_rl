@@ -2,7 +2,7 @@ from typing import Any
 
 from gymnasium.spaces import Space
 
-from utils import SingletonMeta
+from sequential_rl.envs.utils import SingletonMeta
 
 
 class UniversalDomain(Space, metaclass = SingletonMeta):

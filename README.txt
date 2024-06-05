@@ -1,1 +1,1 @@
-这个是为了测试序列模型在强化学习中的表现开的仓库。
+Testing Sequential Models for Reinforcement Learning Algorithms.
