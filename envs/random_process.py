@@ -208,3 +208,10 @@ class DecisionProcessAggregated(DecisionProcess[StateT, ActionT]):
 
     def reward(self) -> float:
         return self.decision_process.reward()
+
+
+# TODO：添加随机过程类到env类的适配接口，因为需要适配 stable_baselines 库。
+# TODO：随机过程类包装env时，需要在done或者truncated时候抛出异常，或者通过info接口获取这些信息。
+
+class DecisionProcessToGymEnvAdapter(gym.Env):
+    pass
