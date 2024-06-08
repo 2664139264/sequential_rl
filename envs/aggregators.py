@@ -43,5 +43,3 @@ def latest_aggregator(
     return map_op(
         (state_seq if hasattr(state_seq, "__getitem__") else tuple(state_seq))[-1]
     )
-
-
