@@ -1,53 +1,104 @@
-from itertools import repeat
+import numpy as np
+import matplotlib.pyplot as plt
 
-import gymnasium as gym
+from stable_baselines3 import SAC
+from stable_baselines3.common.callbacks import BaseCallback
+from stable_baselines3.common.logger import Figure
 
-import gymnasium.spaces as sp
-
-from envs.function import *
-from envs.domain import *
-
-from envs.random_process import *
-from envs.aggregators import *
+model = SAC("MlpPolicy", "Pendulum-v1", tensorboard_log="./tensorboard_log", verbose=1)
 
 
-if __name__ == "__main__":
+class FigureRecorderCallback(BaseCallback):
+    def __init__(self, verbose=0):
+        super().__init__(verbose)
+
+    def _on_step(self):
+        # Plot values (here a random variable)
+        figure = plt.figure()
+        figure.add_subplot().plot(np.random.random(3))
+        # Close the figure after logging it
+        self.logger.record("trajectory/figure", Figure(figure, close=True), exclude=("stdout", "log", "json", "csv"))
+        plt.close()
+        return True
+
+
+model.learn(50000, callback=FigureRecorderCallback())
+
+
+# from itertools import cycle
+# from stable_baselines3.common.callbacks import BaseCallback
+
+# class ChangeMuCallback(BaseCallback):
+#   """
+#   This callback changes the value of mu during training looping
+#   through a list of values until training is aborted.
+#   The environment is implemented so that the impact of changing
+#   the value of mu mid-episode is visible only after the episode is over
+#   and the reset method has been called.
+#   """"
+#   def __init__(self):
+#     super().__init__()
+#     # An iterator that contains the different of the friction coefficient
+#     self.mus = cycle([0.1, 0.2, 0.5, 0.13, 0.9])
+
+#   def _on_step(self):
+#     # Note: in practice, you should not change this value at every step
+#     # but rather depending on some events/metrics like agent performance/episode termination
+#     # both accessible via the `self.logger` or `self.locals` variables
+#     self.training_env.env_method("set_mu", next(self.mus))
+
+
+
+# from itertools import repeat
+
+# import gymnasium as gym
+
+# import gymnasium.spaces as sp
+
+# from envs.function import *
+# from envs.domain import *
+
+# from envs.random_process import *
+# from envs.aggregators import *
+
+
+# if __name__ == "__main__":
 
     
-    env = gym.make("CartPole-v1")
+#     env = gym.make("CartPole-v1")
     
-    rp = GymEnvToDecisionProcessAdapter(env)
+#     rp = GymEnvToDecisionProcessAdapter(env)
     
-    rp.reset()
-    for _ in range(10):
-        rp.step(_ % 2)
-        print("time ", rp.time())
-        print("obs ", rp.observation())
-        print("act ", rp.action())
-        # print("his ", rp.history())
+#     rp.reset()
+#     for _ in range(10):
+#         rp.step(_ % 2)
+#         print("time ", rp.time())
+#         print("obs ", rp.observation())
+#         print("act ", rp.action())
+#         # print("his ", rp.history())
 
-    rp.reset()
-    for _ in range(10):
-        rp.step(_ % 2)
-        print("time ", rp.time())
-        print("obs ", rp.observation())
-        print("act ", rp.action())
-        # print("his ", rp.history())
+#     rp.reset()
+#     for _ in range(10):
+#         rp.step(_ % 2)
+#         print("time ", rp.time())
+#         print("obs ", rp.observation())
+#         print("act ", rp.action())
+#         # print("his ", rp.history())
 
 
-    rp.reset()
-    print()
+#     rp.reset()
+#     print()
     
-    arp = DecisionProcessAggregated(rp, lambda history: sum_aggregator(state_extractor(history)))
+#     arp = DecisionProcessAggregated(rp, lambda history: sum_aggregator(state_extractor(history)))
     
-    arp.reset()
+#     arp.reset()
     
-    for _ in range(10):
-        arp.step(_ % 2)
-        print("time ", arp.time())
-        print("obs ", arp.observation())
-        print("act ", arp.action())
-        # print("his ", arp.history())
+#     for _ in range(10):
+#         arp.step(_ % 2)
+#         print("time ", arp.time())
+#         print("obs ", arp.observation())
+#         print("act ", arp.action())
+#         # print("his ", arp.history())
 
     # rp = IndependentProcess((gym.spaces.Box(i,i) for i in range(10)))
     
