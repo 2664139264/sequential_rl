@@ -6,21 +6,21 @@ from stable_baselines3.common.callbacks import EvalCallback, CallbackList
 
 from utils import AlgoT, EnvT, PolicyInstanceT, EnvInstanceT
 
-log_root = "./log/ppo"
-dqn_algo_args = dict(
+ppo_log_root = "./log/ppo"
+ppo_algo_args = dict(
     verbose = 1,
-    tensorboard_log = log_root
+    tensorboard_log = ppo_log_root
 )
-dqn_learn_args = dict(
+ppo_learn_args = dict(
     total_timesteps = int(1e5),
     progress_bar = True
 )
-dqn_eval_args = dict(
+ppo_eval_args = dict(
     n_eval_episodes = 10
 )
-eval_callback_args = dict(
-    best_model_save_path = os.path.join(log_root, "ckpt"),
-    log_path = os.path.join(log_root, "eval_log"),
+ppo_eval_callback_args = dict(
+    best_model_save_path = os.path.join(ppo_log_root, "ckpt"),
+    log_path = os.path.join(ppo_log_root, "eval_log"),
     eval_freq = 500,
     deterministic = True,
     render = False
@@ -30,9 +30,10 @@ default_policy_constructor = lambda _, __: "MlpPolicy"
 
 def run_ppo(env: EnvInstanceT, eval_env: EnvInstanceT,
         policy_constructor: Callable[[AlgoT, EnvT], PolicyInstanceT] = default_policy_constructor,
-        algo_args: Dict[str, Any] = dqn_algo_args,
-        learn_args: Dict[str, Any] = dqn_learn_args,
-        eval_args: Dict[str, Any] = dqn_eval_args):
+        algo_args: Dict[str, Any] = ppo_algo_args,
+        learn_args: Dict[str, Any] = ppo_learn_args,
+        eval_args: Dict[str, Any] = ppo_eval_args,
+        eval_callback_args: Dict[str, Any] = ppo_eval_callback_args):
 
     policy = policy_constructor(PPO, env.__class__)
     model = PPO(
