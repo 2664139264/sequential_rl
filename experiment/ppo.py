@@ -1,12 +1,12 @@
 import os
 from typing import Callable, Dict, Any
-from stable_baselines3 import DQN
+from stable_baselines3 import PPO
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.callbacks import EvalCallback, CallbackList
 
 from utils import AlgoT, EnvT, PolicyInstanceT, EnvInstanceT
 
-log_root = "./log/dqn"
+log_root = "./log/ppo"
 dqn_algo_args = dict(
     verbose = 1,
     tensorboard_log = log_root
@@ -28,14 +28,14 @@ eval_callback_args = dict(
 
 default_policy_constructor = lambda _, __: "MlpPolicy"
 
-def run_dqn(env: EnvInstanceT, eval_env: EnvInstanceT,
+def run_ppo(env: EnvInstanceT, eval_env: EnvInstanceT,
         policy_constructor: Callable[[AlgoT, EnvT], PolicyInstanceT] = default_policy_constructor,
         algo_args: Dict[str, Any] = dqn_algo_args,
         learn_args: Dict[str, Any] = dqn_learn_args,
         eval_args: Dict[str, Any] = dqn_eval_args):
 
-    policy = policy_constructor(DQN, env.__class__)
-    model = DQN(
+    policy = policy_constructor(PPO, env.__class__)
+    model = PPO(
         policy, env, 
         **algo_args,
     )
