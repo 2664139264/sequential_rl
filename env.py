@@ -1,7 +1,7 @@
 import gymnasium as gym
 
 INIT_STATE_POS = 0
-STATE_POS = 2
+STATE_POS = 1
 
 
 def extract_states(history):
@@ -26,7 +26,7 @@ class AggregatedEnv(gym.Env):
     
     def __init__(self,
             id,
-            aggregator = aggr_latest):
+            aggregator = aggr_state_conv):
         self._env = gym.make(id)
         self._aggregator = aggregator
         

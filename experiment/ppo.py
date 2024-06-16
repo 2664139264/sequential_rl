@@ -12,7 +12,7 @@ ppo_algo_args = dict(
     tensorboard_log = ppo_log_root
 )
 ppo_learn_args = dict(
-    total_timesteps = int(1e5),
+    total_timesteps = int(1e6),
     progress_bar = True
 )
 ppo_eval_args = dict(

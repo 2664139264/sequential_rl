@@ -12,7 +12,7 @@ dqn_algo_args = dict(
     tensorboard_log = dqn_log_root
 )
 dqn_learn_args = dict(
-    total_timesteps = int(1e5),
+    total_timesteps = int(2e5),
     progress_bar = True
 )
 dqn_eval_args = dict(
