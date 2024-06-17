@@ -38,7 +38,7 @@ def run_ppo(env: EnvInstanceT, eval_env: EnvInstanceT,
     policy = policy_constructor(PPO, env.__class__)
     model = PPO(
         policy, env, 
-        **algo_args,
+        **algo_args
     )
     model.learn(
         **learn_args,
