@@ -1,12 +1,13 @@
-依赖 fork 后的 stable_baselines3，rl_zoo3，stable_baselines3_contrib 三个库
-添加这些库作为本库的子模块
+#### 说明 ####
 
+依赖 fork 后的 stable_baselines3，rl_zoo3，stable_baselines3_contrib 三个库的 local 分支
+这些库为本库的子模块，需要独立 push 来修改这些库的 local 分支
 在服务器上 pip install -e . 这些库
 
 
 #### IDEA ####
 
-1. 差分状态作为状态的表示的意义，对观测序列施加线性算符（微分、积分）
+1. 差分状态作为状态的表示的意义，对观测序列施加线性算符（微分、积分、掩码？）
 
 
 #### 索引备查 ####
