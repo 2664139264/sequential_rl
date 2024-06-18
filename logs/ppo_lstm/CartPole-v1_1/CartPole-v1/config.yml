@@ -19,5 +19,10 @@
     - 32
   - - n_timesteps
     - 100000.0
+  - - normalize
+    - true
   - - policy
-    - MlpPolicy
+    - MlpLstmPolicy
+  - - policy_kwargs
+    - dict( ortho_init=False, activation_fn=nn.ReLU, lstm_hidden_size=64, enable_critic_lstm=True,
+      net_arch=dict(pi=[64], vf=[64]) )

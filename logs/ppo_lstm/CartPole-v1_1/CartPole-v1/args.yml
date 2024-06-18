@@ -1,6 +1,6 @@
 !!python/object/apply:collections.OrderedDict
 - - - algo
-    - ppo
+    - ppo_lstm
   - - conf_file
     - null
   - - device
@@ -14,13 +14,13 @@
   - - eval_episodes
     - 5
   - - eval_freq
-    - 25000
+    - 10000
   - - gym_packages
     - []
   - - hyperparams
     - null
   - - log_folder
-    - logs/
+    - logs
   - - log_interval
     - -1
   - - max_total_trials
@@ -52,11 +52,11 @@
   - - sampler
     - tpe
   - - save_freq
-    - -1
+    - 50000
   - - save_replay_buffer
     - false
   - - seed
-    - 1219069588
+    - 3923745680
   - - storage
     - null
   - - study_name
