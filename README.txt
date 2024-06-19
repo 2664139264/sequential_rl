@@ -16,3 +16,4 @@
 1. 注册部分可观测环境               rl-baselines3-zoo/rl_zoo3/import_envs.py
 2. 自定义 Wrapper                  rl-baselines3-zoo/rl_zoo3/wrappers.py
 3. 算法超参数                      rl-baselines3-zoo/hyperparams
+4. RNN 网络定义                    stable-baselines3-contrib/sb3_contrib/common/recurrent/policies.py
