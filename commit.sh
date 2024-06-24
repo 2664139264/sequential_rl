@@ -10,5 +10,5 @@ do
     git add .
     git commit -m $COMMIT_INFO
     git push
-    echo "******* Commit Completed. *******"
+    echo "******* Commit Module $DIR Completed. *******"
 done
