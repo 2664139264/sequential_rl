@@ -17,5 +17,5 @@ pip install -e . these repositories.
 Please refer to: https://github.com/2664139264/rl-baselines3-zoo for implementation of wrappers.
 
 #### Usage ####
-./run_experiments      
-./run_other_experiments
+./run_experiments &
+./run_other_experiments &
