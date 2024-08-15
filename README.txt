@@ -1,21 +1,21 @@
-#### 说明 ####
+#### Intro ####
 
-依赖 fork 后的 stable_baselines3，rl_zoo3，stable_baselines3_contrib 三个库的 local 分支
-这些库为本库的子模块，需要独立 push 来修改这些库的 local 分支
-在服务器上 pip install -e . 这些库
-
-
-#### IDEA ####
-
-1. 差分状态作为状态的表示的意义，对观测序列施加线性算符（微分、积分、掩码？）
-2. 自动机学习
+Dependent on forked stable_baselines3，rl_zoo3，stable_baselines3_contrib, "local" branch
+pip install -e . these repositories.
 
 
-#### 索引备查 ####
+#### Index ####
 
-0. 训练启动入口                     rl-baselines3-zoo/exp_manager.py
-1. 注册部分可观测环境               rl-baselines3-zoo/rl_zoo3/import_envs.py
-2. 自定义 Wrapper                  rl-baselines3-zoo/rl_zoo3/wrappers.py
-3. 算法超参数                      rl-baselines3-zoo/hyperparams
-4. RNN 网络定义                    stable-baselines3-contrib/sb3_contrib/common/recurrent/policies.py
-5. 注册算法                        rl-baselines3-zoo/rl_zoo3/utils.py
+0. Training Starter               rl-baselines3-zoo/exp_manager.py
+1. Register Environments          rl-baselines3-zoo/rl_zoo3/import_envs.py
+2. Define Wrapper                 rl-baselines3-zoo/rl_zoo3/wrappers.py
+3. Hyperparams                    rl-baselines3-zoo/hyperparams
+4. RNN Define                     stable-baselines3-contrib/sb3_contrib/common/recurrent/policies.py
+5. Register New algo              rl-baselines3-zoo/rl_zoo3/utils.py
+
+
+Please refer to: https://github.com/2664139264/rl-baselines3-zoo for implementation of wrappers.
+
+#### Usage ####
+./run_experiments      
+./run_other_experiments
