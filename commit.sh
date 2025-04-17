@@ -9,6 +9,6 @@ do
     echo "******* Commit Module $DIR Start. *******"
     git add .
     git commit -m $COMMIT_INFO
-    git push
+    proxychains git push -v
     echo "******* Commit Module $DIR Completed. *******"
 done
