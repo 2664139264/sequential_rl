@@ -1,9 +1,6 @@
 #!/bin/bash
 
-
-for (( i=0 ; i<6 ; i += 1 ))
-do
-
+for ((i=0; i<6; i++)); do
     echo "Start training CartPoleAggregated$i using PPO"
     python -m rl_zoo3.train --algo ppo --env CartPoleAggregated$i-v1 --eval-freq 20000 --save-freq 500000 > ./experiment_log/CartPolePPO$i.txt 
     echo "Start training CartPoleAggregated$i using PPOLSTM"
@@ -21,7 +18,6 @@ do
     python -m rl_zoo3.train --algo ppo --env PendulumDifferentiated$i-v1 --eval-freq 20000 --save-freq 500000 > ./experiment_log/DifPendulumPPO$i.txt
     echo "Start training PendulumDifferentiated$i using PPOLSTM"
     python -m rl_zoo3.train --algo ppo_lstm --env PendulumDifferentiated$i-v1 --eval-freq 20000 --save-freq 500000 > ./experiment_log/DifPendulumPPOLSTM$i.txt
-
 
     # echo "Start training LunarLanderAggregated$i using PPO"
     # python -m rl_zoo3.train --algo ppo --env LunarLanderAggregated$i-v2 --eval-freq 20000 --save-freq 500000 > ./experiment_log/LunarLanderPPO$i.txt
