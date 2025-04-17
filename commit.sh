@@ -7,8 +7,8 @@ for DIR in ./stable-baselines3 ../stable-baselines3-contrib ../rl-baselines3-zoo
 do
     cd $DIR
     echo "******* Commit Module $DIR Start. *******"
-    git add .
-    git commit -m $COMMIT_INFO
+    proxychains git add .
+    proxychains git commit -m $COMMIT_INFO
     proxychains git push -v
     echo "******* Commit Module $DIR Completed. *******"
 done
